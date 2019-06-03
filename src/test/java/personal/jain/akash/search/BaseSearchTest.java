@@ -19,9 +19,12 @@ public abstract class BaseSearchTest {
 	static void setup(String propertyName) {
 		try {
 			String dataString = (String)TestDataReader.getInstance().get(propertyName);		
-			INT_ARRAY = Arrays.asList(dataString.split(","))
+			System.out.println(dataString.split(",").length);
+			Integer[] temp = {};
+			 temp = Arrays.asList(dataString.split(","))
 				.stream().map(item -> Integer.parseInt(item))
-				.collect(Collectors.toList()).toArray(INT_ARRAY);
+				.collect(Collectors.toList()).toArray(temp);
+			INT_ARRAY = temp;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
