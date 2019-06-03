@@ -1,39 +1,29 @@
 package personal.jain.akash.testdata;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.Properties;
+import java.util.List;
 
-public class TestDataReader extends Properties{
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-	private static final long serialVersionUID = -1159950412857912109L;
-	private static TestDataReader INSTANCE;
-	private static final Object LOCK = new Object();
+public class TestDataReader {
+
+	private List<ISingleTestData<Integer>> testsList;
 	
-	private TestDataReader() throws IOException {
-		super();
-		FileInputStream testDataFileIS = 
-				new FileInputStream(fetchFile("test-data.properties"));
-		load(testDataFileIS);
-		testDataFileIS.close();
+	public TestDataReader(String filename) throws JsonParseException, JsonMappingException, IOException {
+		testsList = 
+				new ObjectMapper().readValue(fetchFile(filename), new TypeReference<List<IntegerSingleTestData>>() {});
 	}
 	
-	public static TestDataReader getInstance() throws IOException {
-		if(INSTANCE != null) {
-			return INSTANCE;			
-		}
-
-		synchronized (LOCK) {
-			if(INSTANCE == null) {
-				INSTANCE = new TestDataReader();
-			}
-			return INSTANCE;
-		}
+	public List<ISingleTestData<Integer>> getTestsList() {
+		return testsList;
 	}
 	
 	private static File fetchFile(String in_filePath) {

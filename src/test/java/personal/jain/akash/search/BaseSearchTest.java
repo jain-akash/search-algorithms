@@ -2,58 +2,58 @@ package personal.jain.akash.search;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.stream.Collectors;
+import java.util.List;
 
 import org.junit.Test;
 
 import personal.jain.akash.search.api.ISearch;
-import personal.jain.akash.testdata.TestDataReader;
+import personal.jain.akash.testdata.ISingleTestData;
 
 public abstract class BaseSearchTest {
-
-	static Integer[] INT_ARRAY = {}; 
-	static void setup(String propertyName) {
-		try {
-			String dataString = (String)TestDataReader.getInstance().get(propertyName);		
-			INT_ARRAY = Arrays.asList(dataString.split(","))
-				.stream().map(item -> Integer.parseInt(item))
-				.collect(Collectors.toList()).toArray(INT_ARRAY);
-		} catch (IOException e) {
-			e.printStackTrace();
+	
+	protected ISearch search;
+	protected List<ISingleTestData<Integer>> testsList;
+	
+	@Test
+	public void runIsPresentTests() {
+		assertNotNull("tests list is null", testsList);
+		assertTrue("tests list is empty" ,testsList.size() > 0);
+		
+		testsList.forEach(item -> { BaseSearchTest.runIsPresentTest(search, item);});
+	}
+	
+	@Test
+	public void runFindTests() {
+		assertNotNull("tests list is null", testsList);
+		assertTrue("tests list is empty" ,testsList.size() > 0);
+		
+		testsList.forEach(item -> { BaseSearchTest.runFindTest(search, item);});
+	}
+	
+	private static void runIsPresentTest(ISearch search, ISingleTestData<Integer> testData) {
+		if(testData.getIndex() > -1) {
+			assertTrue(search.isPresent(testData.getArray(), testData.getItem()));
+		} else {
+			assertFalse(search.isPresent(testData.getArray(), testData.getItem()));
 		}
 	}
 	
-	protected ISearch search;
-	protected Integer[] intArray = null;
+	private static void runFindTest(ISearch search, ISingleTestData<Integer> testData) {
+		assertEquals(testData.getIndex(), search.find(testData.getArray(), testData.getItem()));			
+	}
+	
 	@Test
-    public void isPresentShouldReturnFalse()
+    public void isPresentShouldReturnFalseForNullArray()
     {
         assertFalse(search.isPresent(null, 12));
-
-		assertFalse(search.isPresent(intArray, 458));
     }
 	
 	@Test
-    public void isPresentShouldReturnTrue()
-    {
-        assertTrue(search.isPresent(intArray, 566));
-    }
-	
-	@Test
-    public void findShouldReturnMinusOne()
+    public void findShouldReturnMinusOneForNullArray()
     {
         assertEquals(-1,search.find(null, 12));
-        
-		assertEquals(-1,search.find(intArray, 458));
-    }
-	
-	@Test
-    public void findShouldReturnCorrectValue()
-    {
-		assertEquals(3,search.find(intArray, 566));
     }
 }
